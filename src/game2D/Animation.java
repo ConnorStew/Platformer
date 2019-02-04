@@ -1,10 +1,8 @@
 package game2D;
 
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.image.CropImageFilter;
-import java.awt.image.FilteredImageSource;
-import java.awt.image.ImageFilter;
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.*;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
@@ -22,7 +20,7 @@ public class Animation {
     private long animTime;					// Current animation time
     private long totalDuration;				// Total animation time
     private float animSpeed = 1.0f;			// Animation speed, e.g. 2 will be twice as fast
-    
+
     private boolean loop = true;			// True if the animation should continue looping
     private boolean looped = false;			// True if 1 animation loop has been completed
     private boolean play = true;			//	True if the animation should animate
@@ -171,7 +169,7 @@ public class Animation {
     /**
      * Loads a complete animation from an animation sheet and adds each
      * frame in the sheet to the animation with the given frameDuration.
-     * 
+     *
      * @param fileName	The path to the file to load the animations from
      * @param rows		How many rows there are in the sheet
      * @param columns	How many columns there are in the sheet
@@ -291,8 +289,9 @@ public class Animation {
     	if (f < 0 || f >= frames.size()) return;
     	currFrameIndex = f;
     }
-    
-    /**
+
+
+	/**
      * Private class to hold information about a given
      * animation frame.
      * 

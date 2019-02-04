@@ -25,14 +25,14 @@ public class Platformer extends GameCore {
 
 		background = new ImageIcon("images/background0.png").getImage();
 
-		player.setX(20);
+		player.setX(40);
 		player.setY(60);
 	}
 
 	@Override
 	public void update(long elapsedTime) {
 		super.update(elapsedTime);
-		player.update(elapsedTime, keyPresses, keyReleases);
+		player.update(elapsedTime, keyPresses, keyReleases, keysDown);
 		keyPresses.clear();
 		keyReleases.clear();
 	}

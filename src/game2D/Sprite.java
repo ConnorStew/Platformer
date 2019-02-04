@@ -3,6 +3,7 @@ package game2D;
 import java.awt.Image;
 import java.awt.*;
 import java.awt.geom.*;
+import java.awt.image.AffineTransformOp;
 
 /**
  * This class provides the functionality for a moving animated image or Sprite.
@@ -131,7 +132,7 @@ public class Sprite {
         Updates this Sprite's Animation and its position based
         on the elapsedTime.
 
-        @param The time that has elapsed since the last call to update
+        @param elapsedTime The time that has elapsed since the last call to update
     */
     public void update(long elapsedTime) {
     	if (!render) return;
@@ -324,6 +325,14 @@ public class Sprite {
 		// Apply transform to the image and draw it
 		g.drawImage(getImage(),transform,null);
     }
+
+    public void drawFlipped(Graphics2D g) {
+		// Flip the image horizontally
+		//AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+		//tx.translate(Math.round(x),Math.round(y));
+		g.drawImage(getImage(), (int)(x + width), (int)y, (int)-width, (int)height, null);
+		//g.drawImage(getImage(),tx,null);
+	}
 
 
 	/**

@@ -21,6 +21,7 @@ public abstract class GameCore extends JFrame implements KeyListener {
 
     protected ArrayList<Integer> keyPresses = new ArrayList<>();
     protected ArrayList<Integer> keyReleases = new ArrayList<>();
+	protected ArrayList<String> keysDown = new ArrayList<String>();
 
 	private static final long serialVersionUID = 1L;
 
@@ -242,7 +243,7 @@ public abstract class GameCore extends JFrame implements KeyListener {
 		g = (Graphics2D)win.getGraphics();
 
 		//time stuff
-    	final float FRAMETIME = 16.666667f;		// Equal to 16.66ms or 1000/60
+    	final float FRAMETIME = 1000f / 60f;		// Equal to 16.66ms or 1000/60
 		final int MAX_SKIP = 5;
 
 		long gameTimeStart = System.currentTimeMillis();
@@ -323,6 +324,16 @@ public abstract class GameCore extends JFrame implements KeyListener {
 	{ 
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) stop();
         keyReleases.add(e.getKeyCode());
+
+        String toRemove = KeyEvent.getKeyText(e.getKeyCode());
+        ArrayList<String> removeVals = new ArrayList<>();
+        for (String keyDown : keysDown) {
+        	if (keyDown.equals(toRemove)) {
+				removeVals.add(keyDown);
+			}
+		}
+
+		keysDown.removeAll(removeVals);
 	}
 
 	/**
@@ -330,6 +341,10 @@ public abstract class GameCore extends JFrame implements KeyListener {
 	 */
 	public void keyPressed(KeyEvent e) {
 	    keyPresses.add(e.getKeyCode());
+	    if (!keysDown.contains(KeyEvent.getKeyText(e.getKeyCode()))) {
+			keysDown.add(KeyEvent.getKeyText(e.getKeyCode()));
+		}
+
     }
 	
 	/**

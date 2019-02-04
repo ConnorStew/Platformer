@@ -8,3 +8,6 @@ https://opengameart.org/content/pixel-dinosaurs
 
 https://opengameart.org/content/backgrounds-for-2d-platformers
 	background9.png
+
+https://rvros.itch.io/animated-pixel-hero
+	char
