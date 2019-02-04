@@ -6,6 +6,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import javax.swing.*;
 
@@ -17,6 +18,9 @@ import javax.swing.*;
  * implement the draw() method and override the update method.
 */
 public abstract class GameCore extends JFrame implements KeyListener {
+
+    protected ArrayList<Integer> keyPresses = new ArrayList<>();
+    protected ArrayList<Integer> keyReleases = new ArrayList<>();
 
 	private static final long serialVersionUID = 1L;
 
@@ -73,7 +77,8 @@ public abstract class GameCore extends JFrame implements KeyListener {
         try 
         {
             init(full,x,y);
-            gameLoop();
+            //gameLoop();
+			myGameLoop();
         }
         finally 
 		{ 
@@ -90,7 +95,7 @@ public abstract class GameCore extends JFrame implements KeyListener {
      * @param yres	Height in pixels of game screen
      */
     private void init(boolean full, int xres, int yres) {
-    	
+    	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     	fullScreen = full;
     	
     	if (fullScreen)
@@ -124,7 +129,7 @@ public abstract class GameCore extends JFrame implements KeyListener {
     /**
      * Shows and hides the main game window
      * 
-     * @param true to show the game window, false to hide
+     * @param show to show the game window, false to hide
      * 
      */
     public void setVisible(boolean show)
@@ -178,6 +183,9 @@ public abstract class GameCore extends JFrame implements KeyListener {
         bg = (Graphics2D)buffer.createGraphics();
         bg.setClip(0, 0, getWidth(), getHeight());
 
+        // Get the current graphics device
+        g = (Graphics2D)win.getGraphics();
+
         while (isRunning) {
             elapsedTime = System.currentTimeMillis() - currTime;
             currTime += elapsedTime;
@@ -185,42 +193,94 @@ public abstract class GameCore extends JFrame implements KeyListener {
             // Call the overridden update method
             update(elapsedTime);
 
-	        // Get the current graphics device 	            
-            g = (Graphics2D)win.getGraphics();
-            
-            
-	        if (g != null)
-	        {
- 	            if (fullScreen)
-	            {
-	            	// Set the clipping (drawable) region to be the screen bounds
-	            	g.setClip(0, 0, getWidth(), getHeight());
-		            draw(g);
-	            	screen.update();
-	            	g.dispose();
-	            }
-	            else
-	            {
-	            	draw(bg);
-	            	g.drawImage(buffer,null,0,0);
- 	            }
-            }
-            else
-            {
-            	System.err.println("Null reference for graphics");
-            	break;
-            }
-            
+            draw(bg);
+            g.drawImage(buffer,null,8,31);
+
             frames++;
 
+            //System.out.println(getFPS());
+
+// 	            if (fullScreen)
+//	            {
+//	            	// Set the clipping (drawable) region to be the screen bounds
+//	            	g.setClip(0, 0, getWidth(), getHeight());
+//		            draw(g);
+//	            	screen.update();
+//	            	g.dispose();
+//	            }
+
+
+//            }
+//            else
+//            {
+//            	System.err.println("Null reference for graphics");
+//            	break;
+//            }
+//
+
+
             // take a nap
-            try {
-                Thread.sleep(10);
-            }
-            catch (InterruptedException ex) { }
+//            try {
+//                Thread.sleep(10);
+//            }
+//            catch (InterruptedException ex) { }
         }
         System.exit(0);
     }
+
+    public void myGameLoop() {
+    	//render stuff
+		Graphics2D g;
+		isRunning = true;
+
+		// Create our own buffer
+		buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+		bg = (Graphics2D)buffer.createGraphics();
+		bg.setClip(0, 0, getWidth(), getHeight());
+
+		// Get the current graphics device
+		g = (Graphics2D)win.getGraphics();
+
+		//time stuff
+    	final float FRAMETIME = 16.666667f;		// Equal to 16.66ms or 1000/60
+		final int MAX_SKIP = 5;
+
+		long gameTimeStart = System.currentTimeMillis();
+		long frameTimeStart = System.currentTimeMillis();
+		int accumulator = 0;			// Time passed since the last update
+		int loopCount = 0;
+
+		while (isRunning) {
+			long deltaTime = 0;
+			if (System.currentTimeMillis() - frameTimeStart > 1) {
+				deltaTime = System.currentTimeMillis() - frameTimeStart;		// Time passed for last loop
+				frameTimeStart = System.currentTimeMillis();						// Reset
+				accumulator += deltaTime;							// Add time passed last loop
+			}
+
+			while (accumulator >= FRAMETIME) { // Update if enough time has passed
+				loopCount++;
+				accumulator -= FRAMETIME;
+				update(deltaTime);
+
+				if (loopCount >= MAX_SKIP) {
+					loopCount = 0;
+					accumulator = 0;
+					break;
+				}
+			}
+
+			draw(bg);
+			g.drawImage(buffer,null,8,31);
+
+			// For checking what the fps was
+			long timePassed = System.currentTimeMillis() - gameTimeStart;
+			// std::cout << "milliseconds passed: " << millisPassed.count() << std::endl;
+			// std::cout << "frames passed: " << m_frames << std::endl;
+			// std::cout << "frames per second: "	<< (float) m_frames / ( (float)millisPassed.count() /1000.f) << endl;
+		}
+	}
+
 
 
     /**
@@ -261,25 +321,28 @@ public abstract class GameCore extends JFrame implements KeyListener {
      */
 	public void keyReleased(KeyEvent e) 
 	{ 
-		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) stop(); 
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) stop();
+        keyReleases.add(e.getKeyCode());
 	}
 
 	/**
 	 * Handler for the keyPressed event (empty)
 	 */
-	public void keyPressed(KeyEvent e) { }
+	public void keyPressed(KeyEvent e) {
+	    keyPresses.add(e.getKeyCode());
+    }
 	
 	/**
 	 * Handler for the keyTyped event (empty)
 	 */
-	public void keyTyped(KeyEvent e) {	}
+	public void keyTyped(KeyEvent e) {}
 		
     /** 
      * Updates the state of the game/animation based on the
      * amount of elapsed time that has passed. You should
      * override this in your game class to do something useful.
      */
-    public void update(long elapsedTime) { /* do nothing  */ }
+    public void update(long elapsedTime) {}
 
 
     /** 

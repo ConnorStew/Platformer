@@ -7,6 +7,7 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -66,7 +67,7 @@ public class TileMap {
 					char character = line.charAt(i);
 					StringBuilder numberString = new StringBuilder();
 
-					if (line.charAt(i+1) == '[') { //is there the beginning of an array annotation?
+					if (i + 1 < line.length() && line.charAt(i+1) == '[') { //is there the beginning of an array annotation?
 						int index = i;
 						char currentChar;
 
@@ -146,11 +147,14 @@ public class TileMap {
 	}
 
 	private void addTile(char imageCharacter, int x, int y) {
+		if (imageCharacter == '.')
+			return;
+
 		Image tileImage = tileImages.get(imageCharacter);
 		int width = (tileImage == null) ? 16 : tileImage.getWidth(null);
 		int height = (tileImage == null) ? 16 : tileImage.getHeight(null);
 
-		tiles.put(new Pair<>(x, y), new Tile(tileImage, width, height, imageCharacter));
+		tiles.put(new Pair<>(x, y), new Tile(tileImage, width, height, imageCharacter,x,y));
 	}
 
 	private void parseVariable(String line) {
@@ -215,5 +219,9 @@ public class TileMap {
 			}
 		}
 
+	}
+
+	public Collection<Tile> getTiles() {
+		return tiles.values();
 	}
 }

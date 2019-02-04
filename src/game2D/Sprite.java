@@ -16,12 +16,12 @@ public class Sprite {
     private Animation anim;		
 
     // Position (pixels)
-    private float x;
-    private float y;
+    protected float x;
+    protected float y;
 
     // Velocity (pixels per millisecond)
-    private float dx;
-    private float dy;
+    protected float dx;
+    protected float dy;
 
     // Dimensions of the sprite
     private float height;
@@ -44,12 +44,12 @@ public class Sprite {
     /**
      *  Creates a new Sprite object with the specified Animation.
      *  
-     * @param a The animation to use for the sprite.
+     * @param anim The animation to use for the sprite.
      * 
      */
     public Sprite(Animation anim) {
         this.anim = anim;
-        render = false;
+        render = true;
         scale = 1.0f;
         rotation = 0.0f;
     }
@@ -130,13 +130,11 @@ public class Sprite {
     /**
         Updates this Sprite's Animation and its position based
         on the elapsedTime.
-        
+
         @param The time that has elapsed since the last call to update
     */
     public void update(long elapsedTime) {
     	if (!render) return;
-        x += dx * elapsedTime;
-        y += dy * elapsedTime;
         anim.update(elapsedTime);
         width = anim.getImage().getWidth(null);
         height = anim.getImage().getHeight(null);
