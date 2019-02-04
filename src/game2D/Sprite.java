@@ -14,7 +14,7 @@ import java.awt.image.AffineTransformOp;
 public class Sprite {
 
 	// The current Animation to use for this sprite
-    private Animation anim;		
+    private Animation anim;
 
     // Position (pixels)
     protected float x;
@@ -48,8 +48,8 @@ public class Sprite {
      * @param anim The animation to use for the sprite.
      * 
      */
-    public Sprite(Animation anim) {
-        this.anim = anim;
+    public Sprite() {
+        this.anim = new Animation();
         render = true;
         scale = 1.0f;
         rotation = 0.0f;

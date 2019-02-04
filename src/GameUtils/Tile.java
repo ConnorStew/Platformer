@@ -14,7 +14,6 @@ public class Tile extends Sprite {
 	private final int tileY;
 
 	Tile(Image tileImage, float tileWidth, float tileHeight, char imageChar, int x, int y) {
-		super(new Animation());
 		this.tileImage = tileImage;
 		this.tileWidth = tileWidth;
 		this.tileHeight = tileHeight;

@@ -22,11 +22,7 @@ public class Platformer extends GameCore {
 
 	private void init() {
 		System.out.println(tileMap);
-
 		background = new ImageIcon("images/background0.png").getImage();
-
-		player.setX(40);
-		player.setY(60);
 	}
 
 	@Override

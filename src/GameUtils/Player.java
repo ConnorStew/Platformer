@@ -10,18 +10,22 @@ import java.util.Collection;
 
 enum PlayerState {
     STANDING, WALKING, FALLING, JUMPING;
+
+    public boolean isInAir() {
+        return (this == FALLING || this == JUMPING);
+    }
 }
 
 public class Player extends Sprite {
 
     /** The dy value to set when the player jumps. */
-    private static final float JUMP_SPEED = 17.75f;
+    private static final float JUMP_SPEED = 8.75f;
 
     /** The speed that the player walks at. */
     private static final float WALK_SPEED = 4.3f;
 
     /** The gravity which affects the player. */
-    private static final float GRAVITY_INCREASE = 1f;
+    private static final float GRAVITY_INCREASE = 0.5f;
 	private static final float GRAVITY_MAX = 9.8f;
 
     /** The state the player is currently in. */
@@ -36,12 +40,18 @@ public class Player extends Sprite {
 	private Animation fallAnim = new Animation();
 	private boolean facingRight = true;
 
+    private int xOffSet = 15;
+    private int yOffSet = 5;
+    private float rectX = 20;
+    private float rectY = 20;
+    private float rectWidth = 15;
+    private float rectHeight = 32;
+
 	/**
 	 * Constructs a player which interacts with a given set of tiles.
 	 * @param tiles the tiles that the player will interact with
 	 */
     public Player(Collection<Tile> tiles) {
-        super(new Animation());
         this.tiles = tiles;
 
 		idleAnim.loadAnimationFromSheet("images/char/idle.png",3,1,250);
@@ -56,7 +66,7 @@ public class Player extends Sprite {
         update(elapsedTime);
 
         if (dy < GRAVITY_MAX)
-			dy += GRAVITY_INCREASE;
+            dy += GRAVITY_INCREASE;
 
         for (String keyText : keysDown) {
         	switch (keyText) {
@@ -101,23 +111,21 @@ public class Player extends Sprite {
 				break;
 			case STANDING:
 				dx = 0;
-
+				dy = GRAVITY_INCREASE;
 				setAnimation(idleAnim);
-				//check for a tile below, if not start falling
-				if (colliding(0, 1) == null)
-					state = PlayerState.FALLING;
-
 				break;
 			case WALKING:
-				setRotation(90);
+                dy = GRAVITY_INCREASE;
 				setAnimation(runAnim);
-				//check for a tile below, if not start falling
-				if (colliding(0, 1) == null)
-					state = PlayerState.FALLING;
 				break;
 		}
 
+		float yBefore = y;
 		movePlayer(dx, dy);
+		float yAfter = y;
+
+		if (yAfter > yBefore)
+		    state = PlayerState.FALLING;
     }
 
 	@Override
@@ -126,6 +134,9 @@ public class Player extends Sprite {
     		drawFlipped(g);
     	else
     		super.draw(g);
+
+//    	g.setColor(Color.RED);
+//    	g.drawRect(Math.round(rectX), Math.round(rectY), Math.round(rectWidth), Math.round(rectHeight));
 	}
 
 	private void movePlayer(float xIncrease, float yIncrease) {
@@ -141,16 +152,16 @@ public class Player extends Sprite {
 			float tileX = collidedTile.getX();
 			float tileWidth = collidedTile.getWidth();
 
-			if (x < tileX) { //right collision
+			if (rectX < tileX) { //right collision
 				//System.out.println("right collision!");
-				x = collidedTile.getX() - getWidth();
-			} else if (x > tileX) { //left collision
+                rectX = collidedTile.getX() - rectWidth;
+			} else if (rectX > tileX) { //left collision
 				//System.out.println("left collision!");
-				x = tileX + tileWidth;
+                rectX = tileX + tileWidth;
 			}
 		} else {
 			//System.out.println("Setting x to " + xIncrease);
-			x += xIncrease;
+            rectX = rectX + xIncrease;
 		}
 
 		collidedTile = colliding(0, yIncrease);
@@ -161,56 +172,42 @@ public class Player extends Sprite {
 			float tileHeight = collidedTile.getHeight();
 
 			//move along y axis
-			if (y < tileY) { //top collision
+			if (rectY < tileY) { //top collision
 				//System.out.println("top collision!");
-				y = tileY - getHeight();
+                rectY = tileY - rectHeight;
 				if (dx != 0)
 					state = PlayerState.WALKING;
 				else
 					state = PlayerState.STANDING;
-			} else if (y > tileY) { //bottom collision
+			} else if (rectY > tileY) { //bottom collision
 				//System.out.println("bottom collision!");
-				y = tileY + tileHeight;
+                rectY = tileY + tileHeight;
 				dy = 0;
 				state = PlayerState.FALLING;
 			}
 		} else {
-			//System.out.println("Setting y to " + yIncrease);
-			y += yIncrease;
+			System.out.println("Setting y to " + yIncrease);
+            rectY = rectY + yIncrease;
 		}
+
+		x = rectX - xOffSet;
+		y = rectY - yOffSet;
 	}
 
     private Tile colliding(float xIncrease, float yIncrease) {
-        float textX = x + xIncrease;
-        float testY = y + yIncrease;
+        float textX = rectX + xIncrease;
+        float testY = rectY + yIncrease;
+        float playerWidth = rectWidth;
+        float playerHeight = rectHeight;
 
         for (Tile tile : tiles) {
-            if (tile.imageChar == '.')
-                continue;
-
-            if (tile.getX() < textX + getWidth() &&
+            if (tile.getX() < textX + playerWidth &&
                     tile.getX() + tile.getWidth() > textX &&
-                    tile.getY() < testY + getHeight() &&
+                    tile.getY() < testY + playerHeight &&
                     tile.getHeight() + tile.getY() > testY) {
-
-//                System.out.println(tile.getX() + " < " + textX + " + " + getWidth() + " && \n"
-//                        + tile.getX() + " + " + tile.getWidth()+ " > " + textX + " && \n"
-//                        + tile.getY() + " < " + testY + " + " + getHeight() + " && \n"
-//                        + tile.getHeight() + " + " + tile.getY() + " > " + testY);
                 return tile;
             }
         }
-
-//        for (Tile tile : tiles) {
-//            if (tile.imageChar == '.')
-//                continue;
-//
-//            if (tile.getX() < getX() + getWidth() && tile.getX() + tile.getWidth() > getX() && tile.getY() < getY() + getHeight() && tile.getHeight() + getY() > getY()) {
-//                //System.out.println("Collision with " + tile);
-//                if (state == PlayerState.FALLING || state == PlayerState.JUMPING)
-//                    state = PlayerState.STANDING;
-//            }
-//        }
         return null;
     }
 
