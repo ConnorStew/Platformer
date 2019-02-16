@@ -1,7 +1,7 @@
 #g=grass.png
 #d=dirt.png
 #base
-d.[68]d
+d[70]
 d.[68]d
 d.[68]d
 d.[68]d

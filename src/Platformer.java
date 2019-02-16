@@ -1,18 +1,19 @@
-import GameUtils.Player;
-import GameUtils.TileMap;
+import GameUtils.*;
 import game2D.GameCore;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
+import java.awt.Point;
+import java.util.ArrayList;
 
 public class Platformer extends GameCore {
 
-	private static int SCREEN_WIDTH = 1000;
-	private static int SCREEN_HEIGHT = 1000;
+	private static int SCREEN_WIDTH = 1200;
+	private static int SCREEN_HEIGHT = 600;
 	private TileMap tileMap = new TileMap("newMap.txt");
 	private Image background;
 	private Player player = new Player(tileMap.getTiles());
+	private ArrayList<PortalProjectile> projectiles = new ArrayList<>();
 
 	public static void main(String[] args) {
 		Platformer platformer = new Platformer();
@@ -28,9 +29,29 @@ public class Platformer extends GameCore {
 	@Override
 	public void update(long elapsedTime) {
 		super.update(elapsedTime);
-		player.update(elapsedTime, keyPresses, keyReleases, keysDown);
-		keyPresses.clear();
-		keyReleases.clear();
+		Point mousePos = getContentPane().getMousePosition();
+		if (mousePos == null)
+			mousePos = new Point(0,0);
+
+		if (buttonsDown.contains("1")) { //left click
+			float xDist = mousePos.x - player.getCenterX();
+			float yDist = mousePos.y - player.getCenterY();
+			double magnitude = Math.sqrt(Math.pow(mousePos.x - player.getCenterX(), 2) + Math.pow(mousePos.y - player.getCenterY(), 2));
+
+			double normalX = xDist / magnitude;
+			double normalY = yDist / magnitude;
+
+			projectiles.add(new PortalProjectile(tileMap.getTiles(), player.getCenterX(), player.getCenterY() - 5, PortalColour.ORANGE, normalX, normalY));
+		}
+
+		player.update(elapsedTime, keysDown, buttonsDown, mousePos.x, mousePos.y);
+		ArrayList<PortalProjectile> toRemove = new ArrayList<>();
+		for (PortalProjectile projectile : projectiles)
+			if (projectile.update())
+				toRemove.add(projectile);
+
+		projectiles.removeAll(toRemove);
+		toRemove.clear();
 	}
 
 	@Override
@@ -49,6 +70,11 @@ public class Platformer extends GameCore {
 		tileMap.draw(g,xo,yo);
 		player.draw(g);
 
+		for (PortalProjectile projectile : projectiles) {
+			projectile.draw(g);
+		}
+
+		g.setColor(Color.WHITE);
 		g.drawString(String.valueOf(player.getState()), 10,10);
 	}
 }

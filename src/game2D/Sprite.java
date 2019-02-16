@@ -1,9 +1,11 @@
 package game2D;
 
-import java.awt.Image;
+import GameUtils.Direction;
+import GameUtils.Tile;
+
 import java.awt.*;
-import java.awt.geom.*;
-import java.awt.image.AffineTransformOp;
+import java.awt.geom.AffineTransform;
+import java.util.Collection;
 
 /**
  * This class provides the functionality for a moving animated image or Sprite.
@@ -13,7 +15,8 @@ import java.awt.image.AffineTransformOp;
  */
 public class Sprite {
 
-	// The current Animation to use for this sprite
+    private final Collection<Tile> tiles;
+    // The current Animation to use for this sprite
     private Animation anim;
 
     // Position (pixels)
@@ -25,8 +28,8 @@ public class Sprite {
     protected float dy;
 
     // Dimensions of the sprite
-    private float height;
-    private float width;
+    protected float height;
+    protected float width;
     private float radius;
 
     // The scale to draw the sprite at where 1 equals normal size
@@ -44,11 +47,10 @@ public class Sprite {
 
     /**
      *  Creates a new Sprite object with the specified Animation.
-     *  
-     * @param anim The animation to use for the sprite.
      * 
      */
-    public Sprite() {
+    public Sprite(Collection<Tile> tiles) {
+        this.tiles = tiles;
         this.anim = new Animation();
         render = true;
         scale = 1.0f;
@@ -143,6 +145,134 @@ public class Sprite {
         	radius = width / 2.0f;
         else
         	radius = height / 2.0f;
+    }
+
+
+
+    protected Direction moveSprite(float xIncrease, float yIncrease) {
+        Tile collidedTile;
+        if (xIncrease == 0 && yIncrease == 0)
+            return null;
+
+        Direction collided = null;
+
+        collidedTile = colliding(xIncrease, 0);
+        //if moving the x axis caused a collision
+        if (collidedTile != null) {
+            //System.out.println("x colliding tile : " + collidedTile);
+            //System.out.println(collidedTile.getHeight());
+            float tileX = collidedTile.getX();
+            float tileWidth = collidedTile.getWidth();
+
+            if (x < tileX) { //right collision
+                //System.out.println("right collision!");
+                x = collidedTile.getX() - width;
+                collided = Direction.RIGHT;
+            } else if (x > tileX) { //left collision
+                //System.out.println("left collision!");
+                x = tileX + tileWidth;
+                collided = Direction.LEFT;
+            }
+
+
+        } else {
+            //System.out.println("Setting x(" + x + ") to " + xIncrease);
+            x = x + xIncrease;
+        }
+
+        collidedTile = colliding(0, yIncrease);
+        //if moving the y axis caused a collision
+        if (collidedTile != null) {
+            //System.out.println("y colliding tile : " + collidedTile);
+            float tileY = collidedTile.getY();
+            float tileHeight = collidedTile.getHeight();
+
+            //move along y axis
+            if (y < tileY) { //top collision
+                //System.out.println("top collision!");
+                y = tileY - height;
+                collided = Direction.TOP;
+            } else if (y > tileY) { //bottom collision
+                //System.out.println("bottom collision!");
+                y = tileY + tileHeight;
+                collided = Direction.BOTTOM;
+            }
+
+
+        } else {
+            //System.out.println("Setting y to " + yIncrease);
+            y = y + yIncrease;
+        }
+
+//        System.out.println("Setting x(" + x + ") + " + xIncrease);
+//        System.out.println("Setting y(" + y + ") + " + yIncrease);
+
+        return collided;
+    }
+    protected Tile moveSpriteAndCheckForTiles(float xIncrease, float yIncrease) {
+        Tile collidedTile;
+        if (xIncrease == 0 && yIncrease == 0)
+            return null;
+
+        collidedTile = colliding(xIncrease, 0);
+        //if moving the x axis caused a collision
+        if (collidedTile != null) {
+            //System.out.println("x colliding tile : " + collidedTile);
+            //System.out.println(collidedTile.getHeight());
+            float tileX = collidedTile.getX();
+            float tileWidth = collidedTile.getWidth();
+
+            if (x < tileX) { //right collision
+                //System.out.println("right collision!");
+                x = collidedTile.getX() - width;
+            } else if (x > tileX) { //left collision
+                //System.out.println("left collision!");
+                x = tileX + tileWidth;
+            }
+        } else {
+            //System.out.println("Setting x(" + x + ") to " + xIncrease);
+            x = x + xIncrease;
+        }
+
+        collidedTile = colliding(0, yIncrease);
+        //if moving the y axis caused a collision
+        if (collidedTile != null) {
+            //System.out.println("y colliding tile : " + collidedTile);
+            float tileY = collidedTile.getY();
+            float tileHeight = collidedTile.getHeight();
+
+            //move along y axis
+            if (y < tileY) { //top collision
+                //System.out.println("top collision!");
+                y = tileY - height;
+            } else if (y > tileY) { //bottom collision
+                //System.out.println("bottom collision!");
+                y = tileY + tileHeight;
+            }
+        } else {
+            //System.out.println("Setting y to " + yIncrease);
+            y = y + yIncrease;
+        }
+
+        return collidedTile;
+    }
+
+
+    private Tile colliding(float xIncrease, float yIncrease) {
+        float textX = x + xIncrease;
+        float testY = y + yIncrease;
+        float playerWidth = width;
+        float playerHeight = height;
+
+        for (Tile tile : tiles) {
+            if (tile.getX() < textX + playerWidth &&
+                    tile.getX() + tile.getWidth() > textX &&
+                    tile.getY() < testY + playerHeight &&
+                    tile.getHeight() + tile.getY() > testY) {
+                return tile;
+            }
+        }
+        return null;
     }
 
     /**

@@ -10,10 +10,6 @@ import java.util.Collection;
 
 enum PlayerState {
     STANDING, WALKING, FALLING, JUMPING;
-
-    public boolean isInAir() {
-        return (this == FALLING || this == JUMPING);
-    }
 }
 
 public class Player extends Sprite {
@@ -24,8 +20,10 @@ public class Player extends Sprite {
     /** The speed that the player walks at. */
     private static final float WALK_SPEED = 4.3f;
 
-    /** The gravity which affects the player. */
+    /** The increase in dy per update. */
     private static final float GRAVITY_INCREASE = 0.5f;
+
+    /** The maximum value of dy. */
 	private static final float GRAVITY_MAX = 9.8f;
 
     /** The state the player is currently in. */
@@ -34,12 +32,21 @@ public class Player extends Sprite {
     /** The tiles this player must interact with. */
 	private Collection<Tile> tiles;
 
+	/** Whether the sprite is currently facing right. */
+	private boolean facingRight = true;
+
+	private Rope rope = null;
+
+	private int centerX = 0;
+	private int centerY = 0;
+
+	//animations
 	private Animation runAnim = new Animation();
 	private Animation idleAnim = new Animation();
 	private Animation jumpAnim = new Animation();
 	private Animation fallAnim = new Animation();
-	private boolean facingRight = true;
 
+	//collision mask properties
     private int xOffSet = 15;
     private int yOffSet = 5;
     private float rectX = 20;
@@ -47,11 +54,18 @@ public class Player extends Sprite {
     private float rectWidth = 15;
     private float rectHeight = 32;
 
+    private PlayerState lastState = PlayerState.FALLING;
+    private static final float FALLING_ALLOWANCE = 20;
+    private long timeSinceOnGround = 0;
+	private int mouseX = 0;
+	private int mouseY = 0;
+
 	/**
 	 * Constructs a player which interacts with a given set of tiles.
 	 * @param tiles the tiles that the player will interact with
 	 */
     public Player(Collection<Tile> tiles) {
+    	super(tiles);
         this.tiles = tiles;
 
 		idleAnim.loadAnimationFromSheet("images/char/idle.png",3,1,250);
@@ -62,27 +76,34 @@ public class Player extends Sprite {
 		setAnimation(fallAnim);
     }
 
-	public void update(long elapsedTime, ArrayList<Integer> keyPresses, ArrayList<Integer> keyReleases, ArrayList<String> keysDown) {
+	public void update(long elapsedTime, ArrayList<String> keysDown, ArrayList<String> buttonsDown, int mouseX, int mouseY) {
+		System.out.println("\n" + state);
+		System.out.println(dx + ", " + dy);
+
         update(elapsedTime);
+        timeSinceOnGround += elapsedTime;
+        this.mouseX = mouseX;
+        this.mouseY = mouseY;
+
+		centerX = Math.round(x) + getWidth() / 2;
+		centerY = Math.round(y) + getHeight() / 2;
 
         if (dy < GRAVITY_MAX)
-            dy += GRAVITY_INCREASE;
+			dy = (dy + GRAVITY_INCREASE > GRAVITY_MAX) ? GRAVITY_MAX : (dy += GRAVITY_INCREASE);
 
         for (String keyText : keysDown) {
         	switch (keyText) {
-				case "Space":
-					if (state != PlayerState.FALLING && state != PlayerState.JUMPING) {
-						dy = -JUMP_SPEED;
-						state = PlayerState.JUMPING;
-						System.out.println("jumping");
-					}
-					break;
-				case "D":
-					dx = WALK_SPEED;
+        		case "Space":
+        			if (state == PlayerState.FALLING && timeSinceOnGround < FALLING_ALLOWANCE || state != PlayerState.FALLING && state != PlayerState.JUMPING) {
+        				dy = -JUMP_SPEED;
+        				changeState(PlayerState.JUMPING);
+        			}
+        			break;
+        		case "D":
+        			dx = WALK_SPEED;
 					facingRight = true;
-
 					if (state != PlayerState.FALLING && state != PlayerState.JUMPING)
-						state = PlayerState.WALKING;
+						changeState(PlayerState.WALKING);
 
 					break;
 				case "A":
@@ -90,17 +111,17 @@ public class Player extends Sprite {
 					facingRight = false;
 
 					if (state != PlayerState.FALLING && state != PlayerState.JUMPING)
-						state = PlayerState.WALKING;
+						changeState(PlayerState.WALKING);
 
 					break;
 			}
-        }
+		}
 
 		if (state != PlayerState.FALLING && state != PlayerState.JUMPING && !keysDown.contains("D") && !keysDown.contains("A"))
-			state = PlayerState.STANDING;
+			changeState(PlayerState.STANDING);
 
 		if (state == PlayerState.JUMPING && dy > 0)
-			state = PlayerState.FALLING;
+			changeState(PlayerState.FALLING);
 
 		switch (state) {
 			case JUMPING:
@@ -125,8 +146,17 @@ public class Player extends Sprite {
 		float yAfter = y;
 
 		if (yAfter > yBefore)
-		    state = PlayerState.FALLING;
+			changeState(PlayerState.FALLING);
     }
+
+	/**
+	 * Changes the state of the player and records the last state.
+	 * @param newState the new state of the player
+	 */
+	private void changeState(PlayerState newState) {
+    	lastState = state;
+    	state = newState;
+	}
 
 	@Override
 	public void draw(Graphics2D g) {
@@ -135,8 +165,8 @@ public class Player extends Sprite {
     	else
     		super.draw(g);
 
-//    	g.setColor(Color.RED);
-//    	g.drawRect(Math.round(rectX), Math.round(rectY), Math.round(rectWidth), Math.round(rectHeight));
+		if (rope != null)
+			rope.draw(g);
 	}
 
 	private void movePlayer(float xIncrease, float yIncrease) {
@@ -160,7 +190,7 @@ public class Player extends Sprite {
                 rectX = tileX + tileWidth;
 			}
 		} else {
-			//System.out.println("Setting x to " + xIncrease);
+			//System.out.println("Setting x(" + x + ") to " + xIncrease);
             rectX = rectX + xIncrease;
 		}
 
@@ -175,15 +205,16 @@ public class Player extends Sprite {
 			if (rectY < tileY) { //top collision
 				//System.out.println("top collision!");
                 rectY = tileY - rectHeight;
+                timeSinceOnGround = 0;
 				if (dx != 0)
-					state = PlayerState.WALKING;
+					changeState(PlayerState.WALKING);
 				else
-					state = PlayerState.STANDING;
+					changeState(PlayerState.STANDING);
 			} else if (rectY > tileY) { //bottom collision
 				//System.out.println("bottom collision!");
                 rectY = tileY + tileHeight;
 				dy = 0;
-				state = PlayerState.FALLING;
+				changeState(PlayerState.FALLING);
 			}
 		} else {
 			System.out.println("Setting y to " + yIncrease);
@@ -192,6 +223,9 @@ public class Player extends Sprite {
 
 		x = rectX - xOffSet;
 		y = rectY - yOffSet;
+
+		System.out.println("Setting x(" + x + ") + " + xIncrease);
+		System.out.println("Setting y(" + y + ") + " + yIncrease);
 	}
 
     private Tile colliding(float xIncrease, float yIncrease) {
@@ -214,4 +248,12 @@ public class Player extends Sprite {
     public PlayerState getState() {
         return state;
     }
+
+	public int getCenterY() {
+		return centerY;
+	}
+
+	public int getCenterX() {
+		return centerX;
+	}
 }

@@ -1,10 +1,7 @@
 package game2D;
 
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -17,11 +14,10 @@ import javax.swing.*;
  * Core Game class that implements default game loop. Subclasses should
  * implement the draw() method and override the update method.
 */
-public abstract class GameCore extends JFrame implements KeyListener {
+public abstract class GameCore extends JFrame implements KeyListener, MouseListener {
 
-    protected ArrayList<Integer> keyPresses = new ArrayList<>();
-    protected ArrayList<Integer> keyReleases = new ArrayList<>();
 	protected ArrayList<String> keysDown = new ArrayList<String>();
+	protected ArrayList<String> buttonsDown = new ArrayList<String>();
 
 	private static final long serialVersionUID = 1L;
 
@@ -114,6 +110,7 @@ public abstract class GameCore extends JFrame implements KeyListener {
         setVisible(true);
         
         win.addKeyListener(this);
+        win.addMouseListener(this);
         win.setFont(new Font("Dialog", Font.PLAIN, FONT_SIZE));
 
         this.addComponentListener(new ComponentAdapter()  {
@@ -322,8 +319,8 @@ public abstract class GameCore extends JFrame implements KeyListener {
      */
 	public void keyReleased(KeyEvent e) 
 	{ 
-		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) stop();
-        keyReleases.add(e.getKeyCode());
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+			System.exit(0);
 
         String toRemove = KeyEvent.getKeyText(e.getKeyCode());
         ArrayList<String> removeVals = new ArrayList<>();
@@ -336,15 +333,33 @@ public abstract class GameCore extends JFrame implements KeyListener {
 		keysDown.removeAll(removeVals);
 	}
 
+	@Override
+	public void mousePressed(MouseEvent e) {
+		if (!buttonsDown.contains((String.valueOf(e.getButton())))) {
+			buttonsDown.add(String.valueOf(e.getButton()));
+		}
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		String toRemove = String.valueOf(e.getButton());
+		ArrayList<String> removeVals = new ArrayList<>();
+		for (String keyDown : buttonsDown) {
+			if (keyDown.equals(toRemove)) {
+				removeVals.add(keyDown);
+			}
+		}
+
+		buttonsDown.removeAll(removeVals);
+	}
+
 	/**
 	 * Handler for the keyPressed event (empty)
 	 */
 	public void keyPressed(KeyEvent e) {
-	    keyPresses.add(e.getKeyCode());
 	    if (!keysDown.contains(KeyEvent.getKeyText(e.getKeyCode()))) {
 			keysDown.add(KeyEvent.getKeyText(e.getKeyCode()));
 		}
-
     }
 	
 	/**
@@ -367,4 +382,19 @@ public abstract class GameCore extends JFrame implements KeyListener {
      * @param g The Graphics2D object to draw with.
      */
     public abstract void draw(Graphics2D g);
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+
+	}
 }

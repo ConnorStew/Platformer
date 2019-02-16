@@ -154,7 +154,7 @@ public class TileMap {
 		int width = (tileImage == null) ? 16 : tileImage.getWidth(null);
 		int height = (tileImage == null) ? 16 : tileImage.getHeight(null);
 
-		tiles.put(new Pair<>(x, y), new Tile(tileImage, width, height, imageCharacter,x,y));
+		tiles.put(new Pair<>(x, y), new Tile(tiles.values(),tileImage, width, height, imageCharacter,x,y));
 	}
 
 	private void parseVariable(String line) {
