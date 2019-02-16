@@ -70,7 +70,6 @@ public class Projectile extends Sprite {
             dy = (dy + GRAVITY_INCREASE > GRAVITY_MAX) ? GRAVITY_MAX : (dy += GRAVITY_INCREASE);
     }
 
-    @Override
     public void draw(Graphics2D g) {
         g.setColor(drawColour);
         g.fillRoundRect((int)x,(int)y,10,10, 10, 10);

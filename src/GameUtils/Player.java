@@ -18,7 +18,7 @@ public class Player extends Sprite {
     private static final float JUMP_SPEED = 8.75f;
 
     /** The speed that the player walks at. */
-    private static final float WALK_SPEED = 4.3f;
+    private static final float WALK_SPEED = 3.3f;
 
     /** The increase in dy per update. */
     private static final float GRAVITY_INCREASE = 0.5f;
@@ -77,8 +77,8 @@ public class Player extends Sprite {
     }
 
 	public void update(long elapsedTime, ArrayList<String> keysDown, ArrayList<String> buttonsDown, int mouseX, int mouseY) {
-		System.out.println("\n" + state);
-		System.out.println(dx + ", " + dy);
+//		System.out.println("\n" + state);
+//		System.out.println(dx + ", " + dy);
 
         update(elapsedTime);
         timeSinceOnGround += elapsedTime;
@@ -159,14 +159,11 @@ public class Player extends Sprite {
 	}
 
 	@Override
-	public void draw(Graphics2D g) {
+	public void draw(Graphics2D g, int x, int y) {
     	if (!facingRight)
-    		drawFlipped(g);
+			g.drawImage(getImage(), x + getWidth() / 2, y - getHeight() / 2, (int)-width, (int)height, null);
     	else
-    		super.draw(g);
-
-		if (rope != null)
-			rope.draw(g);
+			g.drawImage(getImage(), x - getWidth() / 2, y - getHeight() / 2, (int)width, (int)height, null);
 	}
 
 	private void movePlayer(float xIncrease, float yIncrease) {
@@ -217,15 +214,15 @@ public class Player extends Sprite {
 				changeState(PlayerState.FALLING);
 			}
 		} else {
-			System.out.println("Setting y to " + yIncrease);
+			//System.out.println("Setting y to " + yIncrease);
             rectY = rectY + yIncrease;
 		}
 
 		x = rectX - xOffSet;
 		y = rectY - yOffSet;
 
-		System.out.println("Setting x(" + x + ") + " + xIncrease);
-		System.out.println("Setting y(" + y + ") + " + yIncrease);
+		//System.out.println("Setting x(" + x + ") + " + xIncrease);
+		//System.out.println("Setting y(" + y + ") + " + yIncrease);
 	}
 
     private Tile colliding(float xIncrease, float yIncrease) {
@@ -256,4 +253,5 @@ public class Player extends Sprite {
 	public int getCenterX() {
 		return centerX;
 	}
+
 }

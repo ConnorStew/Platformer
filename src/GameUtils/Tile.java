@@ -10,17 +10,15 @@ public class Tile extends Sprite {
 	private Image tileImage;
 	private final float tileWidth;
 	private final float tileHeight;
-	public final char imageChar;
 	private final int tileX;
 	private final int tileY;
 	private Color drawColour = null;
 
-	Tile(Collection<Tile> tiles, Image tileImage, float tileWidth, float tileHeight, char imageChar, int x, int y) {
+	Tile(Collection<Tile> tiles, Image tileImage, float tileWidth, float tileHeight, int x, int y) {
 		super(tiles);
 		this.tileImage = tileImage;
 		this.tileWidth = tileWidth;
 		this.tileHeight = tileHeight;
-		this.imageChar = imageChar;
 		this.x = x * tileWidth;
 		this.y = y * tileHeight;
 		this.tileX = x;
@@ -39,16 +37,12 @@ public class Tile extends Sprite {
 		return (int) tileHeight;
 	}
 
-	@Override
 	public void draw(Graphics2D g) {
 		g.drawImage(getImage(),(int)x,(int)y,null);
 		if (drawColour != null) {
 			g.setColor(drawColour);
 			g.drawRect((int)x,(int)y,(int)width,(int)height);
 		}
-
-
-
 	}
 
 	@Override

@@ -35,8 +35,8 @@ public abstract class GameCore extends JFrame implements KeyListener, MouseListe
     private long frames;				// Used to calculate frames per second (FPS)
     private Window win;					// Window object used to handle the display
     
-    private BufferedImage buffer=null;	// buffer is used as a buffered image for drawing offscreen
-    private Graphics2D bg=null;    		// The virtual Graphics2D device associated with the above image
+    protected BufferedImage buffer=null;	// buffer is used as a buffered image for drawing offscreen
+    protected Graphics2D bg=null;    		// The virtual Graphics2D device associated with the above image
     
     
     /**
@@ -113,15 +113,16 @@ public abstract class GameCore extends JFrame implements KeyListener, MouseListe
         win.addMouseListener(this);
         win.setFont(new Font("Dialog", Font.PLAIN, FONT_SIZE));
 
-        this.addComponentListener(new ComponentAdapter()  {
-            public void componentResized(ComponentEvent evt) {
-                //Component c = (Component)evt.getSource();
 
-                buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
-                bg = (Graphics2D)buffer.createGraphics();
-                bg.setClip(0, 0, getWidth(), getHeight());
-            }
-        });
+		this.addComponentListener(new ComponentAdapter()  {
+			public void componentResized(ComponentEvent evt) {
+				//Component c = (Component)evt.getSource();
+
+				buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+				bg = (Graphics2D)buffer.createGraphics();
+				bg.setClip(0, 0, getWidth(), getHeight());
+			}
+		});
     }
     
     /**

@@ -430,11 +430,11 @@ public class Sprite {
 		the current x and y co-ordinates. Scaling and rotation
 		transforms are NOT applied.
 	*/
-    public void draw(Graphics2D g)
+    public void draw(Graphics2D g, int xo, int yo)
     {
     	if (!render) return;
 
-    	g.drawImage(getImage(),(int)x+xoff,(int)y+yoff,null);
+    	g.drawImage(getImage(),(int)x+xo,(int)y+yo,null);
     }
 
 	/**
@@ -456,11 +456,11 @@ public class Sprite {
 		g.drawImage(getImage(),transform,null);
     }
 
-    public void drawFlipped(Graphics2D g) {
+    public void drawFlipped(Graphics2D g, int xo, int yo) {
 		// Flip the image horizontally
 		//AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
 		//tx.translate(Math.round(x),Math.round(y));
-		g.drawImage(getImage(), (int)(x + width), (int)y, (int)-width, (int)height, null);
+		g.drawImage(getImage(), (int)(x + width) + xo, (int)y + yo, (int)-width, (int)height, null);
 		//g.drawImage(getImage(),tx,null);
 	}
 

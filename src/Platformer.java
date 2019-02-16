@@ -1,18 +1,22 @@
 import GameUtils.*;
+import com.sun.javaws.exceptions.InvalidArgumentException;
 import game2D.GameCore;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.Point;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Platformer extends GameCore {
 
 	private static int SCREEN_WIDTH = 1200;
 	private static int SCREEN_HEIGHT = 600;
-	private TileMap tileMap = new TileMap("newMap.txt");
+	private TiledTileMap tileMap;
 	private Image background;
-	private Player player = new Player(tileMap.getTiles());
+	private Player player;
 	private ArrayList<PortalProjectile> projectiles = new ArrayList<>();
 
 	public static void main(String[] args) {
@@ -24,6 +28,15 @@ public class Platformer extends GameCore {
 	private void init() {
 		System.out.println(tileMap);
 		background = new ImageIcon("images/background0.png").getImage();
+
+		try {
+			tileMap = new TiledTileMap("D:\\Year3\\Game Dev\\Assignment\\maps\\map2.json");
+		} catch (InvalidArgumentException e) {
+			e.printStackTrace();
+		}
+
+		player = new Player(tileMap.getTiles());
+
 	}
 
 	@Override
@@ -61,14 +74,14 @@ public class Platformer extends GameCore {
 
 		// First work out how much we need to shift the view
 		// in order to see where the player is.
-		int xo = 0;
-		int yo = 0;
+		int xo = player.getCenterX() - getWidth() /2;
+		int yo = player.getCenterY() - getHeight() /2;
 
 		g.drawImage(background, 0,0, null);
 
 		// Apply offsets to tile map and draw  it
-		tileMap.draw(g,xo,yo);
-		player.draw(g);
+		tileMap.draw(g, xo, yo);
+		player.draw(g, getWidth() /2, getHeight() /2);
 
 		for (PortalProjectile projectile : projectiles) {
 			projectile.draw(g);
