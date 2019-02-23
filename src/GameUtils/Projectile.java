@@ -31,7 +31,7 @@ public class Projectile extends Sprite {
     }
 
     public void update(long elapsedTime, Collection<Tile> tiles) {
-        Direction collided = moveSprite(dx, dy);
+        Direction collided = null;//moveSprite(dx, dy);
 
         float friction = 0.1f;
         if (collided != null) {

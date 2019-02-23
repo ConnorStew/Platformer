@@ -5,6 +5,7 @@ import game2D.Sprite;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -34,8 +35,6 @@ public class Player extends Sprite {
 
 	/** Whether the sprite is currently facing right. */
 	private boolean facingRight = true;
-
-	private Rope rope = null;
 
 	private int centerX = 0;
 	private int centerY = 0;
@@ -85,6 +84,8 @@ public class Player extends Sprite {
         this.mouseX = mouseX;
         this.mouseY = mouseY;
 
+        dx = 0;
+
 		centerX = Math.round(x) + getWidth() / 2;
 		centerY = Math.round(y) + getHeight() / 2;
 
@@ -131,7 +132,6 @@ public class Player extends Sprite {
 				setAnimation(fallAnim);
 				break;
 			case STANDING:
-				dx = 0;
 				dy = GRAVITY_INCREASE;
 				setAnimation(idleAnim);
 				break;
@@ -160,6 +160,8 @@ public class Player extends Sprite {
 
 	@Override
 	public void draw(Graphics2D g, int x, int y) {
+		//being drawn by camera now for some reason
+		System.out.println("Drawing at: x:" + x + ", y:" + y);
     	if (!facingRight)
 			g.drawImage(getImage(), x + getWidth() / 2, y - getHeight() / 2, (int)-width, (int)height, null);
     	else
@@ -171,6 +173,9 @@ public class Player extends Sprite {
 		if (xIncrease == 0 && yIncrease == 0)
 			return;
 
+		float newRectX = 0;
+		float newRectY = 0;
+
 		collidedTile = colliding(xIncrease, 0);
 		//if moving the x axis caused a collision
 		if (collidedTile != null) {
@@ -181,14 +186,14 @@ public class Player extends Sprite {
 
 			if (rectX < tileX) { //right collision
 				//System.out.println("right collision!");
-                rectX = collidedTile.getX() - rectWidth;
+				newRectX = collidedTile.getX() - rectWidth;
 			} else if (rectX > tileX) { //left collision
 				//System.out.println("left collision!");
-                rectX = tileX + tileWidth;
+				newRectX = tileX + tileWidth;
 			}
 		} else {
 			//System.out.println("Setting x(" + x + ") to " + xIncrease);
-            rectX = rectX + xIncrease;
+            newRectX = rectX + xIncrease;
 		}
 
 		collidedTile = colliding(0, yIncrease);
@@ -201,7 +206,7 @@ public class Player extends Sprite {
 			//move along y axis
 			if (rectY < tileY) { //top collision
 				//System.out.println("top collision!");
-                rectY = tileY - rectHeight;
+				newRectY = tileY - rectHeight;
                 timeSinceOnGround = 0;
 				if (dx != 0)
 					changeState(PlayerState.WALKING);
@@ -209,20 +214,27 @@ public class Player extends Sprite {
 					changeState(PlayerState.STANDING);
 			} else if (rectY > tileY) { //bottom collision
 				//System.out.println("bottom collision!");
-                rectY = tileY + tileHeight;
+				newRectY = tileY + tileHeight;
 				dy = 0;
 				changeState(PlayerState.FALLING);
 			}
 		} else {
 			//System.out.println("Setting y to " + yIncrease);
-            rectY = rectY + yIncrease;
+            newRectY = rectY + yIncrease;
+		}
+
+		if (newRectX != 0) {
+			rectX = newRectX;
+			//System.out.println("Setting x(" +newRectX + ")");
+		}
+
+		if (newRectY != 0) {
+			rectY = newRectY;
+			//System.out.println("Setting y(" +newRectY + ")");
 		}
 
 		x = rectX - xOffSet;
 		y = rectY - yOffSet;
-
-		//System.out.println("Setting x(" + x + ") + " + xIncrease);
-		//System.out.println("Setting y(" + y + ") + " + yIncrease);
 	}
 
     private Tile colliding(float xIncrease, float yIncrease) {
@@ -254,4 +266,7 @@ public class Player extends Sprite {
 		return centerX;
 	}
 
+	public boolean isFacingRight() {
+		return facingRight;
+	}
 }

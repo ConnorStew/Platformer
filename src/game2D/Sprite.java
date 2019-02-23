@@ -44,6 +44,8 @@ public class Sprite {
     // relative to specific on screen position (usually the player)
     private int xoff=0;
     private int yoff=0;
+    private float lastX = 0;
+    private float lastY= 0;
 
     /**
      *  Creates a new Sprite object with the specified Animation.
@@ -146,134 +148,84 @@ public class Sprite {
         else
         	radius = height / 2.0f;
     }
-
-
-
-    protected Direction moveSprite(float xIncrease, float yIncrease) {
-        Tile collidedTile;
-        if (xIncrease == 0 && yIncrease == 0)
-            return null;
-
-        Direction collided = null;
-
-        collidedTile = colliding(xIncrease, 0);
-        //if moving the x axis caused a collision
-        if (collidedTile != null) {
-            //System.out.println("x colliding tile : " + collidedTile);
-            //System.out.println(collidedTile.getHeight());
-            float tileX = collidedTile.getX();
-            float tileWidth = collidedTile.getWidth();
-
-            if (x < tileX) { //right collision
-                //System.out.println("right collision!");
-                x = collidedTile.getX() - width;
-                collided = Direction.RIGHT;
-            } else if (x > tileX) { //left collision
-                //System.out.println("left collision!");
-                x = tileX + tileWidth;
-                collided = Direction.LEFT;
-            }
-
-
-        } else {
-            //System.out.println("Setting x(" + x + ") to " + xIncrease);
-            x = x + xIncrease;
-        }
-
-        collidedTile = colliding(0, yIncrease);
-        //if moving the y axis caused a collision
-        if (collidedTile != null) {
-            //System.out.println("y colliding tile : " + collidedTile);
-            float tileY = collidedTile.getY();
-            float tileHeight = collidedTile.getHeight();
-
-            //move along y axis
-            if (y < tileY) { //top collision
-                //System.out.println("top collision!");
-                y = tileY - height;
-                collided = Direction.TOP;
-            } else if (y > tileY) { //bottom collision
-                //System.out.println("bottom collision!");
-                y = tileY + tileHeight;
-                collided = Direction.BOTTOM;
-            }
-
-
-        } else {
-            //System.out.println("Setting y to " + yIncrease);
-            y = y + yIncrease;
-        }
-
-//        System.out.println("Setting x(" + x + ") + " + xIncrease);
-//        System.out.println("Setting y(" + y + ") + " + yIncrease);
-
-        return collided;
-    }
-    protected Tile moveSpriteAndCheckForTiles(float xIncrease, float yIncrease) {
-        Tile collidedTile;
-        if (xIncrease == 0 && yIncrease == 0)
-            return null;
-
-        collidedTile = colliding(xIncrease, 0);
-        //if moving the x axis caused a collision
-        if (collidedTile != null) {
-            //System.out.println("x colliding tile : " + collidedTile);
-            //System.out.println(collidedTile.getHeight());
-            float tileX = collidedTile.getX();
-            float tileWidth = collidedTile.getWidth();
-
-            if (x < tileX) { //right collision
-                //System.out.println("right collision!");
-                x = collidedTile.getX() - width;
-            } else if (x > tileX) { //left collision
-                //System.out.println("left collision!");
-                x = tileX + tileWidth;
-            }
-        } else {
-            //System.out.println("Setting x(" + x + ") to " + xIncrease);
-            x = x + xIncrease;
-        }
-
-        collidedTile = colliding(0, yIncrease);
-        //if moving the y axis caused a collision
-        if (collidedTile != null) {
-            //System.out.println("y colliding tile : " + collidedTile);
-            float tileY = collidedTile.getY();
-            float tileHeight = collidedTile.getHeight();
-
-            //move along y axis
-            if (y < tileY) { //top collision
-                //System.out.println("top collision!");
-                y = tileY - height;
-            } else if (y > tileY) { //bottom collision
-                //System.out.println("bottom collision!");
-                y = tileY + tileHeight;
-            }
-        } else {
-            //System.out.println("Setting y to " + yIncrease);
-            y = y + yIncrease;
-        }
-
-        return collidedTile;
-    }
-
-
-    private Tile colliding(float xIncrease, float yIncrease) {
-        float textX = x + xIncrease;
-        float testY = y + yIncrease;
-        float playerWidth = width;
-        float playerHeight = height;
-
-        for (Tile tile : tiles) {
-            if (tile.getX() < textX + playerWidth &&
-                    tile.getX() + tile.getWidth() > textX &&
-                    tile.getY() < testY + playerHeight &&
-                    tile.getHeight() + tile.getY() > testY) {
-                return tile;
-            }
-        }
-        return null;
-    }
+//
+//    protected Direction moveSprite(float xIncrease, float yIncrease) {
+//        Tile collidedTile;
+//        if (xIncrease == 0 && yIncrease == 0)
+//            return null;
+//
+//        Direction collided = null;
+//
+//        collidedTile = colliding(xIncrease, 0);
+//        //if moving the x axis caused a collision
+//        if (collidedTile != null) {
+//            //System.out.println("x colliding tile : " + collidedTile);
+//            //System.out.println(collidedTile.getHeight());
+//            float tileX = collidedTile.getX();
+//            float tileWidth = collidedTile.getWidth();
+//
+//            if (x < tileX) { //right collision
+//                //System.out.println("right collision!");
+//                x = collidedTile.getX() - width;
+//                collided = Direction.RIGHT;
+//            } else if (x > tileX) { //left collision
+//                //System.out.println("left collision!");
+//                x = tileX + tileWidth;
+//                collided = Direction.LEFT;
+//            }
+//
+//
+//        } else {
+//            //System.out.println("Setting x(" + x + ") to " + xIncrease);
+//            x = x + xIncrease;
+//        }
+//
+//        collidedTile = colliding(0, yIncrease);
+//        //if moving the y axis caused a collision
+//        if (collidedTile != null) {
+//            //System.out.println("y colliding tile : " + collidedTile);
+//            float tileY = collidedTile.getY();
+//            float tileHeight = collidedTile.getHeight();
+//
+//            //move along y axis
+//            if (y < tileY) { //top collision
+//                //System.out.println("top collision!");
+//                y = tileY - height;
+//                collided = Direction.TOP;
+//            } else if (y > tileY) { //bottom collision
+//                //System.out.println("bottom collision!");
+//                y = tileY + tileHeight;
+//                collided = Direction.BOTTOM;
+//            }
+//
+//
+//        } else {
+//            //System.out.println("Setting y to " + yIncrease);
+//            y = y + yIncrease;
+//        }
+//
+////        System.out.println("Setting x(" + x + ") + " + xIncrease);
+////        System.out.println("Setting y(" + y + ") + " + yIncrease);
+//
+//        return collided;
+//    }
+//
+//    private Tile colliding(float xIncrease, float yIncrease) {
+//        float textX = x + xIncrease;
+//        float testY = y + yIncrease;
+//        float playerWidth = width;
+//        float playerHeight = height;
+//
+//        for (Tile tile : tiles) {
+//            if (tile.getX() < textX + playerWidth &&
+//                    tile.getX() + tile.getWidth() > textX &&
+//                    tile.getY() < testY + playerHeight &&
+//                    tile.getHeight() + tile.getY() > testY) {
+//                return tile;
+//            }
+//        }
+//        return null;
+//    }
 
     /**
         Gets this Sprite's current x position.
@@ -490,6 +442,21 @@ public class Sprite {
     	xoff = x;
     	yoff = y;
     }
-    
 
+
+    public void saveX() {
+        lastX = x;
+    }
+
+    public void saveY() {
+        lastY = y;
+    }
+
+    public float getLastX() {
+        return lastX;
+    }
+
+    public float getLastY() {
+        return lastY;
+    }
 }

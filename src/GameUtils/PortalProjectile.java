@@ -29,22 +29,23 @@ public class PortalProjectile extends Sprite {
     }
 
     public boolean update() {
-        boolean delete = false;
-
-        Tile collidedTile = moveSpriteAndCheckForTiles(dx, dy);
-
-        if (collidedTile != null) {
-            if (pc == PortalColour.ORANGE)
-                collidedTile.setDrawColour(Color.ORANGE);
-                //collidedTile.setDrawColour(new Color(1f, 0.5f, 0.01f, 0.1f));
-
-            delete = true;
-        }
-
-        if (dy < GRAVITY_MAX)
-            dy = (dy + GRAVITY_INCREASE > GRAVITY_MAX) ? GRAVITY_MAX : (dy += GRAVITY_INCREASE);
-
-        return delete;
+//        boolean delete = false;
+//
+//        Tile collidedTile = moveSpriteAndCheckForTiles(dx, dy);
+//
+//        if (collidedTile != null) {
+//            if (pc == PortalColour.ORANGE)
+//                collidedTile.setDrawColour(Color.ORANGE);
+//                //collidedTile.setDrawColour(new Color(1f, 0.5f, 0.01f, 0.1f));
+//
+//            delete = true;
+//        }
+//
+//        if (dy < GRAVITY_MAX)
+//            dy = (dy + GRAVITY_INCREASE > GRAVITY_MAX) ? GRAVITY_MAX : (dy += GRAVITY_INCREASE);
+//
+//        return delete;
+        return false;
     }
 
     public void draw(Graphics2D g) {

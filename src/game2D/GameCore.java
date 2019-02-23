@@ -33,7 +33,7 @@ public abstract class GameCore extends JFrame implements KeyListener, MouseListe
     private long elapsedTime;			// Elapsed time since previous check
     
     private long frames;				// Used to calculate frames per second (FPS)
-    private Window win;					// Window object used to handle the display
+    protected Window win;					// Window object used to handle the display
     
     protected BufferedImage buffer=null;	// buffer is used as a buffered image for drawing offscreen
     protected Graphics2D bg=null;    		// The virtual Graphics2D device associated with the above image
@@ -75,7 +75,6 @@ public abstract class GameCore extends JFrame implements KeyListener, MouseListe
         {
             init(full,x,y);
             //gameLoop();
-			myGameLoop();
         }
         finally 
 		{ 
@@ -192,7 +191,7 @@ public abstract class GameCore extends JFrame implements KeyListener, MouseListe
             // Call the overridden update method
             update(elapsedTime);
 
-            draw(bg);
+            //draw(bg);
             g.drawImage(buffer,null,8,31);
 
             frames++;
@@ -227,58 +226,6 @@ public abstract class GameCore extends JFrame implements KeyListener, MouseListe
         System.exit(0);
     }
 
-    public void myGameLoop() {
-    	//render stuff
-		Graphics2D g;
-		isRunning = true;
-
-		// Create our own buffer
-		buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
-		bg = (Graphics2D)buffer.createGraphics();
-		bg.setClip(0, 0, getWidth(), getHeight());
-
-		// Get the current graphics device
-		g = (Graphics2D)win.getGraphics();
-
-		//time stuff
-    	final float FRAMETIME = 1000f / 60f;		// Equal to 16.66ms or 1000/60
-		final int MAX_SKIP = 5;
-
-		long gameTimeStart = System.currentTimeMillis();
-		long frameTimeStart = System.currentTimeMillis();
-		int accumulator = 0;			// Time passed since the last update
-		int loopCount = 0;
-
-		while (isRunning) {
-			long deltaTime = 0;
-			if (System.currentTimeMillis() - frameTimeStart > 1) {
-				deltaTime = System.currentTimeMillis() - frameTimeStart;		// Time passed for last loop
-				frameTimeStart = System.currentTimeMillis();						// Reset
-				accumulator += deltaTime;							// Add time passed last loop
-			}
-
-			while (accumulator >= FRAMETIME) { // Update if enough time has passed
-				loopCount++;
-				accumulator -= FRAMETIME;
-				update(deltaTime);
-
-				if (loopCount >= MAX_SKIP) {
-					loopCount = 0;
-					accumulator = 0;
-					break;
-				}
-			}
-
-			draw(bg);
-			g.drawImage(buffer,null,8,31);
-
-			// For checking what the fps was
-			long timePassed = System.currentTimeMillis() - gameTimeStart;
-			// std::cout << "milliseconds passed: " << millisPassed.count() << std::endl;
-			// std::cout << "frames passed: " << m_frames << std::endl;
-			// std::cout << "frames per second: "	<< (float) m_frames / ( (float)millisPassed.count() /1000.f) << endl;
-		}
-	}
 
 
 
@@ -376,13 +323,7 @@ public abstract class GameCore extends JFrame implements KeyListener, MouseListe
     public void update(long elapsedTime) {}
 
 
-    /** 
-     * Subclasses must override this method to draw output to
-     * the screen via the Graphics2D object 'g'.
-     * 
-     * @param g The Graphics2D object to draw with.
-     */
-    public abstract void draw(Graphics2D g);
+
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
