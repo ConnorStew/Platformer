@@ -29,10 +29,10 @@ public class Sprite {
 	private static final float GRAVITY_MAX = 9.8f;
 
 	/** The center x position of this sprite. */
-	protected int centerX = 0;
+	private int centerX = 0;
 
 	/** The center y position of this sprite. */
-	protected int centerY = 0;
+	private int centerY = 0;
 
 	//collision mask properties
 
@@ -218,7 +218,7 @@ public class Sprite {
 	 * @param other the other sprite
 	 * @return whether the two sprites are colliding
 	 */
-	public boolean collides(Sprite other) {
+	protected boolean collides(Sprite other) {
 		return (other.rectX < rectX + rectWidth &&
 				other.rectX + other.rectWidth > rectX &&
 				other.rectY < rectY + rectHeight &&

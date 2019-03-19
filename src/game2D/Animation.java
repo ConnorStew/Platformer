@@ -42,7 +42,7 @@ public class Animation {
      *
      * @param elapsedTime	Time that has elapsed since last call
      */
-    public void update(long elapsedTime) {
+    void update(long elapsedTime) {
     	elapsedTime = (long)(elapsedTime * animSpeed);
 
         if (frames.size() > 1) {
@@ -67,7 +67,7 @@ public class Animation {
      * 
      * @return The current image that should be displayed
      */
-    public Image getImage() {
+    Image getImage() {
         if (frames.size() == 0) {
             return null;
         } else {
@@ -96,11 +96,6 @@ public class Animation {
     /**
      * Loads a set of images from a sprite sheet so that they can be added to an animation.
      * Courtesy of Donald Robertson.
-     * 
-     * @param sheet
-     * @param rows
-     * @param columns
-     * @return
      */
     private Image[] getImagesFromSheet(Image sheet, int columns, int rows) {
 

@@ -4,7 +4,7 @@ import java.io.*;
 import javax.sound.sampled.*;
 
 /**
- * This class is used to load and play sound files.
+ * This class handles loading and paying sounds.
  * @author Connor Stewart
  */
 public class Sound {
@@ -16,8 +16,8 @@ public class Sound {
 	private Clip soundClip;
 
 	/**
-	 * Creates a new sound by loading a file from the given location.
-	 * @param fileLocation the sound files location
+	 * Initialises the sound from the given location.
+	 * @param fileLocation the location of the sound file
 	 */
 	public Sound(String fileLocation) {
 		this.fileLocation = fileLocation;
@@ -30,10 +30,10 @@ public class Sound {
 	}
 
 	/**
-	 * Loads the sound from the given fileLocation.
-	 * @throws LineUnavailableException error loading the sound file
-	 * @throws IOException error loading the sound file
-	 * @throws UnsupportedAudioFileException error loading the sound file
+	 * Loads the sound.
+	 * @throws LineUnavailableException error loading sound
+	 * @throws IOException error loading sound
+	 * @throws UnsupportedAudioFileException error loading sound
 	 */
 	private void loadSound() throws LineUnavailableException, IOException, UnsupportedAudioFileException {
 		File file = new File(fileLocation);
@@ -44,13 +44,12 @@ public class Sound {
 	}
 
 	/**
-	 * Plays the sound clip on a new thread.
+	 * Plays the sound on a new thread.
 	 */
 	public void play() {
-		new Thread(() -> {
-			soundClip.setFramePosition(0);
-			soundClip.setMicrosecondPosition(0);
-			soundClip.start();
-		});
+		soundClip.setFramePosition(0);
+		soundClip.setMicrosecondPosition(0);
+
+		new Thread(() -> soundClip.start()).start();
 	}
 }
