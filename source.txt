@@ -1,0 +1,13 @@
+grass.png & dirt.png from https://opengameart.org/content/generic-platformer-tileset-16x16-background
+background.png from https://opengameart.org/content/backgrounds-for-2d-platformers
+character sprites from https://rvros.itch.io/animated-pixel-hero
+slime sprite from: https://opengameart.org/content/animated-slime
+coin.png from https://www.gameartguppy.com/shop/ultimate-rotating-coin-pack/
+signpost.png from https://opengameart.org/content/lpc-sign-post
+
+jump.wav from https://opengameart.org/content/platformer-jumping-sounds
+hit.wav from https://freesound.org/people/LittleRobotSoundFactory/sounds/270332/
+win.wav from https://freesound.org/people/LittleRobotSoundFactory/sounds/270330/
+lose.wav from https://freesound.org/people/LittleRobotSoundFactory/sounds/270329/
+button.wav from https://freesound.org/people/LittleRobotSoundFactory/sounds/270324/
+coin.wav from https://freesound.org/people/LittleRobotSoundFactory/sounds/270303/
