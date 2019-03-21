@@ -27,7 +27,8 @@ public class LevelSelect extends JFrame {
     public LevelSelect() {
         levels = new ArrayList<>(Arrays.asList(
                 new Level("Level 1", "maps\\Level1.json"),
-                new Level("Level 2", "maps\\Level2.json")
+                new Level("Level 2", "maps\\Level2.json"),
+                new Level("Level 3", "maps\\Level3.json")
         ));
 
         buttonSound = new Sound("sounds\\button.wav", Sound.Filter.None);
@@ -40,7 +41,7 @@ public class LevelSelect extends JFrame {
      * Creates and sets up the JFrame.
      */
     private void initJFrame() {
-        setSize(200, 400);
+        setSize(200, 200);
         setLayout(new BorderLayout());
         setResizable(false);
 

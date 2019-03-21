@@ -2,6 +2,7 @@ package Game.UI;
 
 import Game.Camera;
 import Game.Entities.Player;
+import Game.Entities.Slime;
 import Game.Entities.Tile;
 import Game.Map;
 import com.sun.javaws.exceptions.InvalidArgumentException;
@@ -116,7 +117,7 @@ public class Level extends JFrame implements KeyListener {
 
         for (Sprite sprite : tileMap.getSprites()) {
         	sprite.updateAnim(elapsedTime);
-			sprite.draw(cam, alpha, false);
+        	sprite.draw(cam, alpha, false);
 		}
 
         player.updateAnim(elapsedTime);

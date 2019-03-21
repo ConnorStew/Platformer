@@ -1,10 +1,13 @@
 package Game;
 
+import Game.Physics.Line;
 import Game.Physics.Point;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
 
 /**
  * This class controls drawing everything relative to a camera region.
@@ -47,6 +50,7 @@ public class Camera {
 
     /** The background image to draw. */
     private Image background;
+    private HashMap<Line,Color> lines = new HashMap<>();
 
     /**
      * Initialises the camera and creates a new buffer.
@@ -164,6 +168,19 @@ public class Camera {
 
         if (background != null)
             g.drawImage(background, (int) ((x / 2) - width), 0, (int) width * 2, (int) height, null);
+
+
+        for (Line line : lines.keySet()) {
+            Color color = lines.get(line);
+            Point p1 = toCameraCoordinates(line.getP1());
+            Point p2 = toCameraCoordinates(line.getP2());
+
+            g.setColor(color);
+            g.drawLine((int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y);
+        }
+
+        if (lines.size() > 1)
+            lines.clear();
     }
 
     /**
@@ -180,5 +197,9 @@ public class Camera {
      */
     public void setBackground(Image background) {
         this.background = background;
+    }
+
+    public void pushDrawLine(Line line, Color color) {
+        lines.put(line, color);
     }
 }

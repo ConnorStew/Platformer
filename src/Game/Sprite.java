@@ -174,13 +174,13 @@ public class Sprite {
 	}
 
 	/**
-	 * Checks if this sprite can see another.<br>
-	 * This uses lines in the tiles and a line between both sprites to see if they are in line of sight.
-	 * @param other the other sprite
+	 * Debug method to draw this methods vision line.
+	 * @param other the sprite to check for vision of
+	 * @param cam the camera to draw to
 	 * @return whether this sprite has line of sight of the other sprite
 	 */
-	protected boolean canSee(Sprite other) {
-		Line visionLine = new Line(x + width / 2, x + height / 2, other.x + other.width / 2, other.y + other.width / 2);
+	protected boolean canSee(Sprite other, Camera cam) {
+		Line visionLine = new Line(getCollisionRectCenter(), other.getCollisionRectCenter());
 
 		boolean canSee = true;
 
@@ -191,7 +191,25 @@ public class Sprite {
 			}
 		}
 
-    	return canSee;
+		if (cam != null) {
+			cam.pushDrawLine(visionLine, Color.RED);
+		}
+
+		return canSee;
+	}
+
+	private Point getCollisionRectCenter() {
+		return new Point(x + rectWidth / 2, y + rectHeight / 2);
+	}
+
+	/**
+	 * Checks if this sprite can see another.<br>
+	 * This uses lines in the tiles and a line between both sprites to see if they are in line of sight.
+	 * @param other the other sprite
+	 * @return whether this sprite has line of sight of the other sprite
+	 */
+	protected boolean canSee(Sprite other) {
+		return canSee(other, null);
 	}
 
 	/**

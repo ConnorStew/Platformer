@@ -1,6 +1,8 @@
 package Game.Entities;
 
 import Game.Animation;
+import Game.Camera;
+import Game.Physics.Line;
 import Game.Sprite;
 
 import java.util.Collection;
@@ -16,6 +18,9 @@ public class Slime extends Sprite {
 
 	/** Used for randomising movement. */
 	private Random random = new Random();
+
+	/** Whether this slime moved right last update. */
+	private boolean movedRightLastUpdate;
 
 	/** The starting move speed when a slime slides. */
 	private static final float MOVE_SPEED = 5.5f;
@@ -49,7 +54,7 @@ public class Slime extends Sprite {
 
 		if (dx == 0) {
 			boolean moveRight = random.nextBoolean(); //random between moving left or right
-			if (player != null && canSee(player)) //if the player is in the slimes vision
+			if (canSee(player)) //if the player is in the slimes vision
 				if (player.getY() + height <= y + height) //if the players position is higher or the same compared to the slime
 					moveRight = player.getX() > x;
 
@@ -57,14 +62,19 @@ public class Slime extends Sprite {
 				dx = MOVE_SPEED * random.nextFloat();
 			else
 				dx = -(MOVE_SPEED * random.nextFloat());
+
+			movedRightLastUpdate = moveRight;
 		}
 
 		//apply gravity whenever
 		moveSprite(0, dy);
 
 		//only move the slime if there will be a tile under it
-		float checkX = x + dx;
-		float checkY = y + dy + rectHeight + 1; //check one pixel under the left hand side of the sprite
+		float checkX = x + dx; //check left hand side if moved left
+		if (movedRightLastUpdate)
+			checkX += rectWidth; //check right hand side if moved right
+
+		float checkY = y + dy + rectHeight + 1; //check one pixel under the sprite
 		for (Tile tile: tiles) {
 			if (checkX > tile.getX() && checkX < tile.getX() + tile.getWidth()) {
 				if (checkY > tile.getY() && checkY < tile.getY() + tile.getHeight()) {
